@@ -15,11 +15,47 @@ bot = commands.Bot(command_prefix=',', intents=intents)  # Prefixo atualizado pa
 # Dicionário para armazenar posts e seus comentários
 posts = {}
 
-
 @bot.event
 async def on_ready():
     print(f'{bot.user} está online!')
 
+@bot.event
+async def on_message(message):
+    # Ignora mensagens do próprio bot
+    if message.author == bot.user:
+        return
+    
+    # Verifica se a mensagem foi enviada no canal correto
+    if message.channel.id == CHANNEL_ID:
+        # Verifica se a mensagem contém anexos (imagens)
+        if message.attachments:
+            image_url = message.attachments[0].url
+            caption = message.content.strip() if message.content.strip() else None  # Pega a legenda se houver
+
+            embed = nextcord.Embed(title="Novo Post!", description=caption or "", color=0x000000)
+            embed.set_author(name=message.author.display_name, icon_url=message.author.avatar.url)
+            embed.set_image(url=image_url)
+            embed.set_footer(text="Use os botões abaixo para interagir com o post!")
+
+            post_message = await message.channel.send(embed=embed)
+
+            post_id = post_message.id
+            posts[post_id] = {
+                "author": message.author,
+                "caption": caption,
+                "image_url": image_url,
+                "likes": 0,
+                "likes_users": [],
+                "comments": []
+            }
+
+            view = PostView(post_message, post_id)
+            await post_message.edit(view=view)
+
+            await message.delete()  # Apaga a mensagem original que contém a imagem
+
+    # Deixe o bot processar outros comandos também
+    await bot.process_commands(message)
 
 class PostView(View):
     def __init__(self, post_message, post_id):
@@ -83,42 +119,5 @@ class PostView(View):
             await interaction.response.send_message(f"Comentários:\n{comments_text}", ephemeral=True)
         else:
             await interaction.response.send_message("Ainda não há comentários.", ephemeral=True)
-
-
-@bot.command(name='postar')
-async def postar(ctx, *, caption=None):
-    if ctx.channel.id != CHANNEL_ID:
-        # Apaga a mensagem do usuário silenciosamente sem responder
-        await ctx.message.delete()
-        return
-
-    if not ctx.message.attachments:
-        # Apaga a mensagem caso não tenha anexos
-        await ctx.message.delete()
-        return
-
-    image_url = ctx.message.attachments[0].url
-
-    embed = nextcord.Embed(title="Novo Post!", description=caption or "", color=0x000000)
-    embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar.url)
-    embed.set_image(url=image_url)
-    embed.set_footer(text="Use os botões abaixo para interagir com o post!")
-
-    post_message = await ctx.send(embed=embed)
-
-    post_id = post_message.id
-    posts[post_id] = {
-        "author": ctx.author,
-        "caption": caption,
-        "image_url": image_url,
-        "likes": 0,
-        "likes_users": [],
-        "comments": []
-    }
-
-    view = PostView(post_message, post_id)
-    await post_message.edit(view=view)
-
-    await ctx.message.delete()
 
 bot.run(TOKEN)
