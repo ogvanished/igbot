@@ -10,7 +10,7 @@ intents.messages = True
 intents.guilds = True
 intents.message_content = True
 
-bot = commands.Bot(command_prefix=',', intents=intents)  # Prefixo atualizado para ','
+bot = commands.Bot(command_prefix=',', intents=intents)
 
 # Dicionário para armazenar posts e seus comentários
 posts = {}
@@ -63,7 +63,7 @@ class PostView(View):
         self.post_message = post_message
         self.post_id = post_id
 
-    @nextcord.ui.button(label="Curtir", style=nextcord.ButtonStyle.green)
+    @nextcord.ui.button(label="Curtir", style=nextcord.ButtonStyle.secondary)  # Cor cinza
     async def like_button(self, button: Button, interaction: nextcord.Interaction):
         post = posts[self.post_id]
 
@@ -75,7 +75,7 @@ class PostView(View):
         post["likes"] += 1
         await interaction.response.send_message(f"Você curtiu o post! ❤️ Total de curtidas: {post['likes']}", ephemeral=True)
 
-    @nextcord.ui.button(label="Ver Curtidas", style=nextcord.ButtonStyle.primary)
+    @nextcord.ui.button(label="Ver Curtidas", style=nextcord.ButtonStyle.secondary)  # Cor cinza
     async def view_likes_button(self, button: Button, interaction: nextcord.Interaction):
         post = posts[self.post_id]
         if post["likes_users"]:
@@ -84,7 +84,7 @@ class PostView(View):
         else:
             await interaction.response.send_message("Ninguém curtiu este post ainda.", ephemeral=True)
 
-    @nextcord.ui.button(label="Comentar", style=nextcord.ButtonStyle.primary)
+    @nextcord.ui.button(label="Comentar", style=nextcord.ButtonStyle.secondary)  # Cor cinza
     async def comment_button(self, button: Button, interaction: nextcord.Interaction):
         post = posts[self.post_id]
 
@@ -111,7 +111,7 @@ class PostView(View):
             await dm_channel.send("Você demorou muito para responder. Tente novamente.")
             await interaction.response.send_message("Você não respondeu a tempo. Tente novamente.", ephemeral=True)
 
-    @nextcord.ui.button(label="Ver Comentários", style=nextcord.ButtonStyle.grey)
+    @nextcord.ui.button(label="Ver Comentários", style=nextcord.ButtonStyle.secondary)  # Cor cinza
     async def view_comments_button(self, button: Button, interaction: nextcord.Interaction):
         post = posts[self.post_id]
         if post["comments"]:
