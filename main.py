@@ -2,7 +2,7 @@ import nextcord
 from nextcord.ext import commands
 from nextcord.ui import Button, View
 
-TOKEN = 'MTMyNDQ0NjI3Mzc4ODU3OTk0MQ.GiuLOt.U8PSMDexh-5N6duLtdvh5t1yC2PYqUq99c63n4'  # Substitua pelo token do bot
+TOKEN = ''  # Substitua pelo token do bot
 CHANNEL_ID = 1324931084873629769  # ID do canal permitido
 
 intents = nextcord.Intents.default()
