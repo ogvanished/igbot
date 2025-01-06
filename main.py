@@ -88,11 +88,13 @@ class PostView(View):
 @bot.command(name='postar')
 async def postar(ctx, *, caption=None):
     if ctx.channel.id != CHANNEL_ID:
-        await ctx.send("Este comando só pode ser usado em um canal específico.", delete_after=10)
+        # Apaga a mensagem do usuário silenciosamente sem responder
+        await ctx.message.delete()
         return
 
     if not ctx.message.attachments:
-        await ctx.send("Por favor, anexe uma imagem ao seu post!")
+        # Apaga a mensagem caso não tenha anexos
+        await ctx.message.delete()
         return
 
     image_url = ctx.message.attachments[0].url
